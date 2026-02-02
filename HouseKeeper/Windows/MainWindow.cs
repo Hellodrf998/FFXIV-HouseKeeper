@@ -4,7 +4,6 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
-using System.Globalization;
 
 namespace HouseKeeper.Windows;
 
@@ -34,19 +33,30 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("House entry reminders for personal estates.");
         ImGui.Text($"Reminders enabled: {(plugin.Configuration.EnableNotifications ? "Yes" : "No")}");
         ImGui.Text($"Reminder interval: {plugin.Configuration.ReminderIntervalDays} days");
+        ImGui.Text($"Alert before expiry: {plugin.Configuration.AlertBeforeExpiryDays} days");
 
         var lastEntry = plugin.Configuration.LastHouseEntryUtc;
-        var lastEntryDisplay = lastEntry == DateTime.MinValue
-            ? "Not recorded yet"
-            : lastEntry.ToLocalTime().ToString("f", CultureInfo.CurrentCulture);
+        var lastEntryDisplay = TimeDisplay.FormatUtcDate(lastEntry);
         ImGui.Text($"Last recorded entry: {lastEntryDisplay}");
 
         var nextDue = plugin.Configuration.LastHouseEntryUtc == DateTime.MinValue
             ? "Pending first entry"
             : plugin.Configuration.LastHouseEntryUtc.AddDays(plugin.Configuration.ReminderIntervalDays)
                 .ToLocalTime()
-                .ToString("f", CultureInfo.CurrentCulture);
+                .ToString("f");
         ImGui.Text($"Next reminder due: {nextDue}");
+
+        var timeToExpiry = "Pending first entry";
+        if (lastEntry != DateTime.MinValue)
+        {
+            var dueDate = lastEntry.AddDays(plugin.Configuration.ReminderIntervalDays);
+            var remaining = dueDate - DateTime.UtcNow;
+            timeToExpiry = remaining <= TimeSpan.Zero
+                ? $"Expired {TimeDisplay.FormatTimeSpan(remaining)} ago"
+                : TimeDisplay.FormatTimeSpan(remaining);
+        }
+
+        ImGui.Text($"Time to expiry: {timeToExpiry}");
 
         ImGuiHelpers.ScaledDummy(8.0f);
 

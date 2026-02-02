@@ -12,6 +12,7 @@ public class Configuration : IPluginConfiguration
     public bool EnableNotifications { get; set; } = true;
     public bool NotifyOnHouseEntry { get; set; } = true;
     public int ReminderIntervalDays { get; set; } = 45;
+    public int AlertBeforeExpiryDays { get; set; } = 7;
     public DateTime LastHouseEntryUtc { get; set; } = DateTime.MinValue;
     public DateTime LastReminderUtc { get; set; } = DateTime.MinValue;
 

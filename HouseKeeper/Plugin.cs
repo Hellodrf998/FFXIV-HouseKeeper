@@ -113,7 +113,8 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         var dueDate = Configuration.LastHouseEntryUtc.AddDays(Configuration.ReminderIntervalDays);
-        if (now < dueDate)
+        var alertStart = dueDate.AddDays(-Configuration.AlertBeforeExpiryDays);
+        if (now < alertStart)
         {
             return;
         }
@@ -123,7 +124,12 @@ public sealed class Plugin : IDalamudPlugin
             return;
         }
 
-        SendChatNotification($"It has been {Configuration.ReminderIntervalDays} days since your last recorded house entry. Visit your estate hall to refresh the timer.");
+        var remaining = dueDate - now;
+        var reminderMessage = remaining <= TimeSpan.Zero
+            ? $"Your estate entry timer expired {TimeDisplay.FormatTimeSpan(remaining)} ago. Enter your estate hall to refresh it."
+            : $"Your estate entry timer expires in {TimeDisplay.FormatTimeSpan(remaining)}. Enter your estate hall to refresh it.";
+
+        SendChatNotification(reminderMessage);
         Configuration.LastReminderUtc = now;
         Configuration.Save();
     }
@@ -146,7 +152,8 @@ public sealed class Plugin : IDalamudPlugin
 
         if (Configuration.NotifyOnHouseEntry)
         {
-            SendChatNotification($"House entry recorded. The {Configuration.ReminderIntervalDays}-day timer has been reset.");
+            var remaining = Configuration.LastHouseEntryUtc.AddDays(Configuration.ReminderIntervalDays) - DateTime.UtcNow;
+            SendChatNotification($"House entry recorded. Time until expiry: {TimeDisplay.FormatTimeSpan(remaining)}.");
         }
     }
 
