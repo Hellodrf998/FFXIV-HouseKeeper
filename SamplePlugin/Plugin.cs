@@ -158,7 +158,7 @@ public sealed class Plugin : IDalamudPlugin
             return false;
         }
 
-        var placeName = territoryRow.PlaceName.Value.Name ?? string.Empty;
+        var placeName = territoryRow.PlaceName.Value.Name.ToString();
         return placeName.Contains("Estate Hall", StringComparison.OrdinalIgnoreCase);
     }
 
