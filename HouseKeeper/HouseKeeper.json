@@ -1,0 +1,12 @@
+{
+  "Author": "HouseKeeper Team",
+  "Name": "HouseKeeper",
+  "Punchline": "45-day house entry reminders.",
+  "Description": "HouseKeeper reminds you to enter your personal estate hall every 45 days. Use /housekeeper to open the status window.",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "housing",
+    "reminder",
+    "notification"
+  ]
+}
