@@ -17,7 +17,7 @@ public class ConfigWindow : Window, IDisposable
         Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
 
-        Size = new Vector2(320, 180);
+        Size = new Vector2(360, 240);
         SizeCondition = ImGuiCond.Always;
 
         configuration = plugin.Configuration;
@@ -40,6 +40,26 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
+        ImGui.Text("HouseKeeper settings");
+        ImGui.Separator();
+
+        var lastEntry = configuration.LastHouseEntryUtc;
+        var lastEntryDisplay = TimeDisplay.FormatUtcDate(lastEntry);
+        ImGui.Text($"Last entry: {lastEntryDisplay}");
+
+        var expiryDisplay = "Pending first entry";
+        if (lastEntry != DateTime.MinValue)
+        {
+            var dueDate = lastEntry.AddDays(configuration.ReminderIntervalDays);
+            var remaining = dueDate - DateTime.UtcNow;
+            expiryDisplay = remaining <= TimeSpan.Zero
+                ? $"Expired {TimeDisplay.FormatTimeSpan(remaining)} ago"
+                : TimeDisplay.FormatTimeSpan(remaining);
+        }
+
+        ImGui.Text($"Time to expiry: {expiryDisplay}");
+        ImGui.Spacing();
+
         var enableNotifications = configuration.EnableNotifications;
         if (ImGui.Checkbox("Enable reminders", ref enableNotifications))
         {
@@ -58,6 +78,13 @@ public class ConfigWindow : Window, IDisposable
         if (ImGui.InputInt("Reminder interval (days)", ref reminderDays))
         {
             configuration.ReminderIntervalDays = Math.Max(1, reminderDays);
+            configuration.Save();
+        }
+
+        var alertBeforeExpiry = configuration.AlertBeforeExpiryDays;
+        if (ImGui.InputInt("Alert before expiry (days)", ref alertBeforeExpiry))
+        {
+            configuration.AlertBeforeExpiryDays = Math.Max(0, alertBeforeExpiry);
             configuration.Save();
         }
 

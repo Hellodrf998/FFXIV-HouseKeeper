@@ -1,0 +1,12 @@
+{
+  "Author": "HouseKeeper Team",
+  "Name": "HouseKeeper",
+  "Punchline": "Personal estate entry reminders.",
+  "Description": "HouseKeeper tracks your last personal estate hall entry and reminds you before the 45-day timer expires. Use /housekeeper to open the status window.",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "housing",
+    "reminder",
+    "notification"
+  ]
+}
